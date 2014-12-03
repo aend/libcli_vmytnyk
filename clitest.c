@@ -159,7 +159,8 @@ int cmd_debug_regular(struct cli_def *cli, UNUSED(const char *command), char *ar
     return CLI_OK;
 }
 
-int cmd_toggle(void * param, struct cli_def *cli, const char *command, char *argv[], int argc)
+int cmd_toggle(void * param, struct cli_command * cmd,
+        struct cli_def *cli, const char *command, char *argv[], int argc)
 {
     int * local_toggle_ptr = (int *)param;
 

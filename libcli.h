@@ -74,8 +74,8 @@ struct cli_filter {
 };
 
 typedef int (*cli_callback_f)(struct cli_def *, const char *, char **, int);
-typedef int (*cli_callback2_f)(void * param,
-        struct cli_def *, struct cli_command* cmd , const char *, char **, int);
+typedef int (*cli_callback2_f)(void * param, struct cli_command* cmd ,
+                              struct cli_def *,  const char *, char **, int);
 
 struct cli_command {
     char *command;
@@ -138,8 +138,7 @@ int cli_unregister_subcommand(struct cli_def *cli,
 int cli_unregister_subcommand2(struct cli_def *cli,
         struct cli_command * parent, const char *command, int privilege, int mode , void ** param );
 struct cli_command *cli_register_command2(struct cli_def *cli, struct cli_command *parent, const char *command,
-                                         int (*callback2)(void * param, struct cli_def *, const char *, char **, int),
-                                         void * param, int privilege, int mode, const char *help);
+        cli_callback2_f callback2,  void * param, int privilege, int mode, const char *help);
 
 #ifdef __cplusplus
 }
