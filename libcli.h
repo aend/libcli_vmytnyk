@@ -135,6 +135,8 @@ char * cli_get_cmd_help(struct cli_def *cli, const char * cmd);
 char * cli_cmd_help(struct cli_command * cmd);
 int cli_unregister_subcommand(struct cli_def *cli,
         struct cli_command * parent, const char *command, int privilege, int mode );
+struct cli_command * cli_get_command(struct cli_def *cli,
+        struct cli_command * parent, const char *command, int privilege, int mode );
 int cli_unregister_subcommand2(struct cli_def *cli,
         struct cli_command * parent, const char *command, int privilege, int mode , void ** param );
 struct cli_command *cli_register_command2(struct cli_def *cli, struct cli_command *parent, const char *command,

@@ -375,6 +375,11 @@ struct cli_command *cli_register_command(struct cli_def *cli, struct cli_command
     struct cli_command *c, *p;
 
     if (!command) return NULL;
+
+    //check if command already exists!!
+    c = cli_get_command( cli, parent, command, privilege, mode );
+    if (c && (callback == c->callback)) return c;
+
     if (!(c = calloc(sizeof(struct cli_command), 1))) return NULL;
 
     c->callback = callback;
@@ -2414,6 +2419,20 @@ int cli_unregister_subcommand(struct cli_def *cli,
         struct cli_command * parent, const char *command, int privilege, int mode )
 {
     return cli_unregister_subcommand2( cli, parent, command, privilege, mode , NULL ) ;
+}
+
+struct cli_command * cli_get_command(struct cli_def *cli,
+        struct cli_command * parent, const char *command, int privilege, int mode )
+{
+    struct cli_command *c;
+    for (c = parent->children; c; c = c->next)
+    {
+        if ( ( c->privilege == privilege ) && ( c->mode == mode ) && ( 0 == strcmp(c->command, command) ) )
+        {
+            return c;
+        }
+    }
+    return NULL ;
 }
 
 int cli_unregister_subcommand2(struct cli_def *cli,
