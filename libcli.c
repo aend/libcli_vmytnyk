@@ -33,6 +33,8 @@
 #define MATCH_REGEX     1
 #define MATCH_INVERT    2
 
+#define COMMENT_CHAR    '#'
+
 #ifdef WIN32
 /*
  * Stupid windows has multiple namespaces for filedescriptors, with different
@@ -707,6 +709,9 @@ static int cli_parse_line(const char *line, char *words[], int max_words)
         }
         p++;
     }
+
+    //if start with comment char return
+    if ( *p == COMMENT_CHAR ) return 0 ;
 
     while (nwords < max_words - 1)
     {
