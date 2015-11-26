@@ -2430,6 +2430,7 @@ struct cli_command * cli_get_command(struct cli_def *cli,
         struct cli_command * parent, const char *command, int privilege, int mode )
 {
     struct cli_command *c;
+    if ( !parent ) return NULL ;
     for (c = parent->children; c; c = c->next)
     {
         if ( ( c->privilege == privilege ) && ( c->mode == mode ) && ( 0 == strcmp(c->command, command) ) )

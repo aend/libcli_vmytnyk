@@ -261,7 +261,7 @@ int main()
     myctx.message = mymessage;
 
     cli = cli_init();
-    cli_set_banner(cli, "libcli test environment");
+    cli_set_banner(cli, "libcli test environment. login:fred password:nerk");
     cli_set_hostname(cli, "router");
     cli_telnet_protocol(cli, 1);
     cli_regular(cli, regular_callback);
