@@ -31,6 +31,8 @@
 
 unsigned int regular_count = 0;
 unsigned int debug_regular = 0;
+unsigned int nested_status = 1;
+struct cli_command *nested = NULL ;
 
 struct my_context {
   int value;
@@ -311,6 +313,7 @@ int transparent_validator(struct cli_def *cli, const char *name, const char *val
   return strcasecmp("transparent", value) ? CLI_ERROR : CLI_OK;
 }
 
+
 int check1_validator(struct cli_def *cli, UNUSED(const char *name), UNUSED(const char *value)) {
   char *color;
   char *transparent;
@@ -328,6 +331,28 @@ int check1_validator(struct cli_def *cli, UNUSED(const char *name), UNUSED(const
   }
   return CLI_OK;
 }
+
+int cmd_nested_toggle(struct cli_def *cli, const char *command, char *argv[], int argc)
+{
+    nested_status = !nested_status;
+
+    cli_print(cli, "%s" , cli_get_cmd_help( cli, command) );
+
+    cli_print(cli, "toggle nested_status to:%d", nested_status );
+    if ( !nested_status )
+    {
+        cli_unregister_subcommand( cli, nested, "remove", PRIVILEGE_UNPRIVILEGED, MODE_EXEC );
+        cli_register_command(cli, nested, "add", cmd_nested_toggle, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "toggle nested remove");
+    }
+    else
+    {
+        cli_unregister_subcommand( cli, nested, "add", PRIVILEGE_UNPRIVILEGED, MODE_EXEC );
+        cli_register_command(cli, nested, "remove", cmd_nested_toggle, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "toggle nested add");
+    }
+
+    return CLI_OK;
+}
+
 
 int cmd_deep_dive(struct cli_def *cli, const char *command, char *argv[], int argc) {
   cli_print(cli, "Raw commandline was <%s>", cli->pipeline->cmdline);

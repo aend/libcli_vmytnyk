@@ -3,4 +3,5 @@
 *.so
 *.so.*
 clitest
+clitest-static
 compile_commands.json

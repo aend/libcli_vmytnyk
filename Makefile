@@ -4,6 +4,8 @@ DYNAMIC_LIB ?= 1
 STATIC_LIB ?= 1
 # Run tests by default
 TESTS ?= 1
+#enable poll by default
+CFLAGS?=-DLIBCLI_USE_POLL
 
 UNAME = $(shell sh -c 'uname -s 2>/dev/null || echo not')
 DESTDIR =
@@ -38,7 +40,7 @@ ifeq (1,$(STATIC_LIB))
 TARGET_LIBS += $(LIB_STATIC)
 endif
 
-all: $(TARGET_LIBS) $(if $(filter 1,$(TESTS)),clitest)
+all: $(TARGET_LIBS) $(if $(filter 1,$(TESTS)),clitest clitest-static)
 
 $(LIB): libcli.o
 	$(CC) -o $(LIB).$(MAJOR).$(MINOR).$(REVISION) $^ $(LDFLAGS) $(LIBS)
@@ -56,12 +58,16 @@ libcli.o: libcli.h
 
 clitest: clitest.o $(LIB)
 	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ $< -L. -lcli
+	
+clitest-static: clitest.o $(LIB_STATIC)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ $< $(LIB_STATIC) $(LIBS)
+
 
 clitest.exe: clitest.c libcli.o
 	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ $< libcli.o -lws2_32
 
 clean:
-	rm -f *.o $(LIB)* $(LIB_STATIC) clitest libcli-$(MAJOR).$(MINOR).$(REVISION).tar.gz
+	rm -f *.o $(LIB)* $(LIB_STATIC) clitest clitest-static libcli-$(MAJOR).$(MINOR).$(REVISION).tar.gz
 
 install: $(TARGET_LIBS)
 	install -d $(DESTDIR)$(PREFIX)/include $(DESTDIR)$(PREFIX)/lib

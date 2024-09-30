@@ -38,6 +38,8 @@
 #define MATCH_REGEX 1
 #define MATCH_INVERT 2
 
+#define COMMENT_CHAR    '#'
+
 #ifdef WIN32
 // Stupid windows has multiple namespaces for filedescriptors, with different read/write functions required for each ..
 int read(int fd, void *buf, unsigned int count) {
@@ -1230,6 +1232,7 @@ int cli_loop(struct cli_def *cli, int sockfd) {
 
         perror("read");
         l = -1;
+
         break;
       }
 
@@ -3657,4 +3660,61 @@ static int cli_socket_wait(int sockfd, struct timeval *tm) {
   FD_SET(sockfd, &r);
   return select(sockfd + 1, &r, NULL, NULL, tm);
 #endif
+}
+
+//CUSTOM FUNCTION
+
+char * cli_get_cmd_help(struct cli_def *cli, const char * cmd)
+{
+    char *help = NULL , *words[CLI_MAX_LINE_WORDS] = { 0 };
+    struct cli_command *c ;
+    int i, num_words = 0 , ii ;
+
+    num_words = cli_parse_line(cmd, words, CLI_MAX_LINE_WORDS);
+
+    for ( ii = 0 , c = cli->commands ; (c != NULL) && (ii < num_words) ; /* done in loop */ )
+    {
+        if (    ( c->privilege == cli->privilege )
+             && ( (c->mode == cli->mode) || (c->mode == MODE_ANY) )
+             && ( 0 == strncasecmp(c->command, words[ii], c->unique_len) )
+             && ( 0 == strncasecmp(c->command, words[ii], strlen(words[ii])) ) )
+        {
+            help = c->help ;
+            c = c->children ;
+            ++ii ;
+        }
+        else
+        {
+            c = c->next ;
+        }
+    }
+
+    for ( i = 0 ; i < num_words ; ++i )
+        free(words[i]);
+
+    return ( ii == num_words ) ? help : NULL ;
+}
+
+int cli_unregister_subcommand(struct cli_def *cli,
+        struct cli_command * parent, const char *command, int privilege, int mode )
+{
+    struct cli_command **c, *p = NULL;
+
+    if (!command) return -1;
+    if (!parent) return cli_unregister_command( cli, command ) ;
+    if (!cli->commands) return CLI_OK;
+
+    for (c = &parent->children; *c; c = &p->next)
+    {
+        p = *c;
+        if (    ( p->privilege == privilege ) && ( p->mode == mode )
+             && ( 0 == strcmp(p->command, command) ) )
+        {
+            *c = p->next; //update pointer in container
+            cli_free_command( cli, p);
+            return CLI_OK;
+        }
+    }
+
+    return CLI_OK;
 }

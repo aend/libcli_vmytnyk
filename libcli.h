@@ -91,6 +91,7 @@ struct cli_def {
   int disallow_buildmode;
   struct cli_pipeline *pipeline;
   struct cli_buildmode *buildmode;
+  char comment_char ;
 };
 
 struct cli_filter {
@@ -834,6 +835,11 @@ int cli_enable(struct cli_def *cli, const char *command, char *argv[], int argc)
  * @return     always returns CLI_QUIT
  */
 int cli_disable(struct cli_def *cli, const char *command, char *argv[], int argc);
+
+//CUSTOM FUNCTION
+char * cli_get_cmd_help(struct cli_def *cli, const char * cmd);
+int cli_unregister_subcommand(struct cli_def *cli,
+        struct cli_command * parent, const char *command, int privilege, int mode );
 
 #ifdef __cplusplus
 }
