@@ -2431,8 +2431,7 @@ struct cli_command * cli_get_command(struct cli_def *cli,
         struct cli_command * parent, const char *command, int privilege, int mode )
 {
     struct cli_command *c;
-    if ( !parent ) return NULL ;
-    for (c = parent->children; c; c = c->next)
+    for (c = ((parent)?parent->children:cli->commands); c; c = c->next)
     {
         if ( ( c->privilege == privilege ) && ( c->mode == mode ) && ( 0 == strcmp(c->command, command) ) )
         {
@@ -2448,10 +2447,9 @@ int cli_unregister_subcommand2(struct cli_def *cli,
     struct cli_command **c, *p = NULL;
 
     if (!command) return -1;
-    if (!parent) return cli_unregister_subcommand2( cli, cli->commands, command, privilege, mode , param ) ;
-    if (!cli->commands) return CLI_OK;
+    if (!cli->commands)return CLI_OK;
 
-    for (c = &parent->children; *c; c = &p->next)
+    for (c = ((parent)?&parent->children:&cli->commands) ; *c; c = &p->next)
     {
         p = *c;
         if (    ( p->privilege == privilege ) && ( p->mode == mode )

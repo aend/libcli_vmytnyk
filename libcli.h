@@ -143,6 +143,8 @@ int cli_unregister_subcommand2(struct cli_def *cli,
 struct cli_command *cli_register_command2(struct cli_def *cli, struct cli_command *parent, const char *command,
         cli_callback2_f callback2,  void * param, int privilege, int mode, const char *help);
 
+int cli_int_quit(struct cli_def *cli, const char *command, char *argv[], int argc );
+
 #ifdef __cplusplus
 }
 #endif
